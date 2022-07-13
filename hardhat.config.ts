@@ -15,6 +15,12 @@ const config: HardhatUserConfig = {
       accounts: [process.env.PRIVATE_KEY ?? ""],
       chainId: 1
     }
+  },
+  etherscan: {
+    apiKey: {
+      rinkeby: process.env.ETHERSCAN_KEY ?? "",
+      mainnet: process.env.ETHERSCAN_KEY ?? "",
+    }
   }
 };
 

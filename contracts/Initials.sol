@@ -35,7 +35,8 @@ contract Initials is ERC721Enumerable, ERC2981, Ownable {
 
   bytes32 private _root;
   bytes32 private _freeMintRoot;
-  mapping(address => uint8) public _freemint;
+  // Check freemints
+  mapping(address => uint8) public freemint;
   
   uint256 private _numAvailableTokens;
   mapping(uint256 => uint256) private _availableTokens;
@@ -79,8 +80,8 @@ contract Initials is ERC721Enumerable, ERC2981, Ownable {
         }
         if(msg.value < CHOOSE_PRICE) revert PriceNotMet();
       } else {
-        if(_freemint[msg.sender] > 0) revert AlreadyFreeMinted();
-        _freemint[msg.sender] += 1;
+        if(freemint[msg.sender] > 0) revert AlreadyFreeMinted();
+        freemint[msg.sender] += 1;
       }
       if(totalSupply() + 1 > MAX_SUPPLY) revert SoldOut();
       if(tokenId > MAX_SUPPLY) revert TokenOutOfBound();

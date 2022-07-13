@@ -1,3 +1,5 @@
 export PRIVATE_KEY=""
 
 export INFURA_KEY=""
+
+export ETHERSCAN_KEY=""
