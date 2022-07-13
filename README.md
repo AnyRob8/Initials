@@ -18,4 +18,4 @@ Then :
 - `yarn verify {mainnet | rinkeby} {contract-address}`
 
 
-*** Todo: replace deployement by https://github.com/wighawag/hardhat-deploy ***
+*Todo: replace deployement by https://github.com/wighawag/hardhat-deploy*
