@@ -13,3 +13,9 @@ Copy :
 Then :
 - `direnv allow .`
 - `yarn deploy {mainnet | rinkeby}`
+  
+## Verify
+- `yarn verify {mainnet | rinkeby} {contract-address}`
+
+
+*** Todo: replace deployement by https://github.com/wighawag/hardhat-deploy ***

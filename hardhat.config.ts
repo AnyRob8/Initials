@@ -1,6 +1,7 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
-
+import "@ethersproject/abi";
+import "hardhat-abi-exporter";
 
 const config: HardhatUserConfig = {
   solidity: "0.8.15",
@@ -15,6 +16,17 @@ const config: HardhatUserConfig = {
       accounts: [process.env.PRIVATE_KEY ?? ""],
       chainId: 1
     }
+  },
+  etherscan: {
+    apiKey: {
+      rinkeby: process.env.ETHERSCAN_KEY ?? "",
+      mainnet: process.env.ETHERSCAN_KEY ?? "",
+    }
+  },
+  abiExporter: {
+    path: './abis',
+    clear: true,
+    flat: true
   }
 };
 

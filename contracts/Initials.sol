@@ -33,9 +33,10 @@ contract Initials is ERC721Enumerable, ERC2981, Ownable {
   // Sets Treasury Address for withdraw() and ERC2981 royaltyInfo
   address public treasuryAddress;
 
-  bytes32 private _root;
-  bytes32 private _freeMintRoot;
-  mapping(address => uint8) public _freemint;
+  bytes32 public immutable root;
+  bytes32 public immutable freeMintRoot;
+  // Check freemints
+  mapping(address => bool) public freemint;
   
   uint256 private _numAvailableTokens;
   mapping(uint256 => uint256) private _availableTokens;
@@ -48,17 +49,17 @@ contract Initials is ERC721Enumerable, ERC2981, Ownable {
   ) ERC721 ("Initials", "AZ") {
       setTreasuryAddress(payable(defaultTreasury));
       setRoyaltyInfo(750);
-      setRoot(defaultRoot);
-      setFreeMintRoot(defaultFreeMintRoot);
       setBaseURIs(defaultUri);
+      setSale(false);
+      root = defaultRoot;
+      freeMintRoot = defaultFreeMintRoot;
       _numAvailableTokens = MAX_SUPPLY;
-      PUBLIC_SALE = false;
   }
   
   function randomMint(uint256 quantity, bytes32[] calldata proof) external payable {
       if(!PUBLIC_SALE) {
         if(proof.length == 0) revert MissingProof();
-        if(!MerkleProof.verify(proof, _root, keccak256(abi.encodePacked(msg.sender)))) revert NotWhitelisted();
+        if(!MerkleProof.verify(proof, root, keccak256(abi.encodePacked(msg.sender)))) revert NotWhitelisted();
       }
       if(totalSupply() + quantity > MAX_SUPPLY) revert SoldOut();
       if(balanceOf(msg.sender) + quantity > MAX_MINT_PER_ADDRESS) revert MaxMinted();
@@ -72,16 +73,18 @@ contract Initials is ERC721Enumerable, ERC2981, Ownable {
   }
 
   function mint(uint256 tokenId, bytes32[] calldata proof) external payable {
-      if(!MerkleProof.verify(proof, _freeMintRoot, keccak256(abi.encodePacked(msg.sender)))) {
-        if(!PUBLIC_SALE) {
-          if(proof.length == 0) revert MissingProof();
-          if(!MerkleProof.verify(proof, _root, keccak256(abi.encodePacked(msg.sender)))) revert NotWhitelisted();
+      if(proof.length == 0) {
+        if(!MerkleProof.verify(proof, freeMintRoot, keccak256(abi.encodePacked(msg.sender)))) {
+          if(!PUBLIC_SALE) {
+            if(!MerkleProof.verify(proof, root, keccak256(abi.encodePacked(msg.sender)))) revert NotWhitelisted();
+          }
+          if(msg.value < CHOOSE_PRICE) revert PriceNotMet();
+        } else {
+          if(freemint[msg.sender]) revert AlreadyFreeMinted();
+          freemint[msg.sender] = true;
         }
-        if(msg.value < CHOOSE_PRICE) revert PriceNotMet();
-      } else {
-        if(_freemint[msg.sender] > 0) revert AlreadyFreeMinted();
-        _freemint[msg.sender] += 1;
       }
+      if(!PUBLIC_SALE) revert MissingProof();
       if(totalSupply() + 1 > MAX_SUPPLY) revert SoldOut();
       if(tokenId > MAX_SUPPLY) revert TokenOutOfBound();
 
@@ -96,20 +99,6 @@ contract Initials is ERC721Enumerable, ERC2981, Ownable {
     */
   function setSale(bool sale) public onlyOwner {
       PUBLIC_SALE = sale;
-  }
-
-  /**
-    * @dev Update whitelist root
-    */
-  function setRoot(bytes32 root) public onlyOwner {
-      _root = root;
-  }
-
-  /**
-    * @dev Update freemint root
-    */
-  function setFreeMintRoot(bytes32 root) public onlyOwner {
-      _freeMintRoot = root;
   }
 
   /**
