@@ -9,3 +9,6 @@
   Copy envrc-example to envrc and fill it. Then :
 - `direnv allow .`
 - `yarn deploy {mainnet | rinkeby}`
+  
+## Verify
+- `yarn verify {mainnet | rinkeby} {contract-address}`
