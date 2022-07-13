@@ -6,6 +6,10 @@
 - `yarn test`
 
 ## Deploy
-  Copy envrc-example to envrc and fill it. Then :
+Copy :
+- `envrc-example.txt` to `.envrc`
+- `constants-example.ts` to `constants.ts`
+
+Then :
 - `direnv allow .`
 - `yarn deploy {mainnet | rinkeby}`
